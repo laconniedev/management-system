@@ -1,0 +1,30 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #99c3e4;
+  --color-accent1: #fff9e6;
+  --color-accent2: #c1e4f3;
+  --color-sky: #e3f1fb;
+  --color-cloud: #a9d8e3;
+  --color-teal: #3f8597;
+  --color-ink: #34506b;
+  --color-navy: #5b6fa3;
+}
+
+@theme inline {
+  --font-sans: var(--font-nunito), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-fredoka), var(--font-nunito), ui-sans-serif, sans-serif;
+}
+
+body {
+  background-color: #e3f1fb;
+  background-image: url("/sheep-tile.svg");
+  background-size: 88px 116px;
+  color: var(--color-ink);
+}
+
+/* Keyboard focus ring that fits the palette. */
+:focus-visible {
+  outline: 3px solid #5b95e0;
+  outline-offset: 2px;
+}
