@@ -5,9 +5,11 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import {
+  DIRECTOR_CODE_MIN,
   PASSWORD_MIN,
   PROGRAM_NAME_MAX,
   PROGRAM_NAME_MIN,
+  hashDirectorCode,
   normalizeProgramName,
   programEmail,
   programKey,
@@ -55,6 +57,14 @@ export async function createProgram(_prev: AuthFormState, formData: FormData): P
   }
   if (password !== confirm) return { error: "The two passwords don't match." };
 
+  const directorCode = String(formData.get("directorCode") ?? "");
+  const confirmDirectorCode = String(formData.get("confirmDirectorCode") ?? "");
+  if (directorCode.length < DIRECTOR_CODE_MIN) {
+    return { error: `Director code must be at least ${DIRECTOR_CODE_MIN} characters.` };
+  }
+  if (directorCode !== confirmDirectorCode) return { error: "The two director codes don't match." };
+  if (directorCode === password) return { error: "The director code must be different from the password." };
+
   const takenError = { error: `"${name}" is already taken. Please choose a different program name.` };
 
   let admin: ReturnType<typeof createAdminClient>;
@@ -95,6 +105,15 @@ export async function createProgram(_prev: AuthFormState, formData: FormData): P
     await admin.auth.admin.deleteUser(created.user.id);
     if (insertError.code === "23505") return takenError;
     console.error("Insert program failed", insertError);
+    return { error: "Couldn't create the program right now. Please try again." };
+  }
+
+  const { error: secretError } = await admin
+    .from("program_secrets")
+    .insert({ program_id: created.user.id, director_code_hash: hashDirectorCode(directorCode) });
+  if (secretError) {
+    await admin.auth.admin.deleteUser(created.user.id); // also removes the programs row
+    console.error("Save director code failed", secretError);
     return { error: "Couldn't create the program right now. Please try again." };
   }
 

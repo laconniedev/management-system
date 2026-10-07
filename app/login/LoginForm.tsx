@@ -2,7 +2,7 @@
 
 import { useActionState, useEffect, useRef, useState } from "react";
 import { SheepIcon } from "@/components/Sheep";
-import { PASSWORD_MIN, PROGRAM_NAME_MAX } from "@/lib/program";
+import { DIRECTOR_CODE_MIN, PASSWORD_MIN, PROGRAM_NAME_MAX } from "@/lib/limits";
 import { createProgram, login, type AuthFormState } from "./actions";
 
 type Mode = "login" | "create";
@@ -90,6 +90,44 @@ export function LoginForm({ programNames, expired }: { programNames: string[]; e
               placeholder="Type it again"
               className={inputClass}
             />
+          </div>
+        )}
+
+        {!isLogin && (
+          <div className="space-y-3 rounded-2xl bg-accent1 p-4">
+            <div>
+              <label htmlFor="directorCode" className={labelClass}>
+                Director code
+              </label>
+              <p className="mb-2 text-xs text-[#7A5A00]">
+                Only the director should know this. It&apos;s needed to change the program password.
+              </p>
+              <input
+                id="directorCode"
+                name="directorCode"
+                type="password"
+                autoComplete="off"
+                required
+                minLength={DIRECTOR_CODE_MIN}
+                placeholder={`At least ${DIRECTOR_CODE_MIN} characters`}
+                className={inputClass}
+              />
+            </div>
+            <div>
+              <label htmlFor="confirmDirectorCode" className={labelClass}>
+                Confirm director code
+              </label>
+              <input
+                id="confirmDirectorCode"
+                name="confirmDirectorCode"
+                type="password"
+                autoComplete="off"
+                required
+                minLength={DIRECTOR_CODE_MIN}
+                placeholder="Type it again"
+                className={inputClass}
+              />
+            </div>
           </div>
         )}
 

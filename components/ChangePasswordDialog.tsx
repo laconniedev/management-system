@@ -2,7 +2,7 @@
 
 import { useActionState } from "react";
 import { changePassword, type ChangePasswordState } from "@/app/dashboard/actions";
-import { PASSWORD_MIN } from "@/lib/program";
+import { PASSWORD_MIN } from "@/lib/limits";
 import { Modal } from "./Modal";
 
 const inputClass =
@@ -29,11 +29,14 @@ export function ChangePasswordDialog({ onClose }: { onClose: () => void }) {
         </div>
       ) : (
         <form action={action} className="space-y-3">
+          <p className="rounded-2xl bg-accent1 px-4 py-3 text-sm text-[#7A5A00]">
+            Only the program director can change the password.
+          </p>
           <div>
-            <label htmlFor="currentPassword" className={labelClass}>
-              Current password
+            <label htmlFor="directorCode" className={labelClass}>
+              Director code
             </label>
-            <input id="currentPassword" name="currentPassword" type="password" autoComplete="current-password" required className={inputClass} />
+            <input id="directorCode" name="directorCode" type="password" autoComplete="off" required className={inputClass} />
           </div>
           <div>
             <label htmlFor="newPassword" className={labelClass}>

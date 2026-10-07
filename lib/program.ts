@@ -1,4 +1,7 @@
-import { createHash } from "crypto";
+// Server-only helpers (uses Node's crypto). Browser code should import from lib/limits.ts instead.
+import { createHash, randomBytes, scryptSync, timingSafeEqual } from "crypto";
+
+export { PROGRAM_NAME_MIN, PROGRAM_NAME_MAX, PASSWORD_MIN, DIRECTOR_CODE_MIN } from "./limits";
 
 /** Trim and collapse repeated spaces: "  Sunny   Kids " -> "Sunny Kids". */
 export function normalizeProgramName(name: string): string {
@@ -19,6 +22,18 @@ export function programEmail(name: string): string {
   return `program-${hash}@programs.management-system.local`;
 }
 
-export const PROGRAM_NAME_MIN = 2;
-export const PROGRAM_NAME_MAX = 60;
-export const PASSWORD_MIN = 8;
+/** Scramble a director code for storage. The original code can't be recovered from the result. */
+export function hashDirectorCode(code: string): string {
+  const salt = randomBytes(16).toString("hex");
+  const hash = scryptSync(code, salt, 64).toString("hex");
+  return `${salt}:${hash}`;
+}
+
+/** Check a typed director code against the stored scrambled version. */
+export function verifyDirectorCode(code: string, stored: string): boolean {
+  const [salt, hash] = stored.split(":");
+  if (!salt || !hash) return false;
+  const expected = Buffer.from(hash, "hex");
+  const actual = scryptSync(code, salt, expected.length);
+  return timingSafeEqual(expected, actual);
+}
