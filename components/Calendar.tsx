@@ -10,7 +10,14 @@ import { DayDialog } from "./DayDialog";
 const MAX_CHIPS = 3; // desktop: show up to 3, or 2 + "+N more"
 const MAX_DOTS = 3; // phone: show up to 3 dots, then "+N"
 
-export function Calendar({ programId }: { programId: string }) {
+export function Calendar({
+  programId,
+  onViewChange,
+}: {
+  programId: string;
+  /** Called with the month being shown (month is 0-based), e.g. so the sticky notes can follow it. */
+  onViewChange?: (year: number, month: number) => void;
+}) {
   const supabase = useMemo(() => getBrowserClient(), []);
   const today = new Date();
   const todayKey = toKey(today);
@@ -19,6 +26,10 @@ export function Calendar({ programId }: { programId: string }) {
   const [items, setItems] = useState<Item[]>([]);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [openDay, setOpenDay] = useState<string | null>(null);
+
+  useEffect(() => {
+    onViewChange?.(view.year, view.month);
+  }, [view, onViewChange]);
 
   const days = useMemo(() => monthGrid(view.year, view.month), [view]);
   const rangeStart = toKey(days[0]);

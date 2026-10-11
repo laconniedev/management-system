@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { SheepIcon } from "@/components/Sheep";
 import { Calendar } from "@/components/Calendar";
 import { ChangePasswordDialog } from "@/components/ChangePasswordDialog";
+import { StickyNotes } from "@/components/StickyNotes";
 import { logout } from "./actions";
 
 export function Dashboard({
@@ -16,6 +17,15 @@ export function Dashboard({
   sessionEndsAt: number;
 }) {
   const [showChangePassword, setShowChangePassword] = useState(false);
+  const [shownMonth, setShownMonth] = useState(() => {
+    const now = new Date();
+    return { year: now.getFullYear(), month: now.getMonth() };
+  });
+  const onViewChange = useCallback(
+    (year: number, month: number) =>
+      setShownMonth((prev) => (prev.year === year && prev.month === month ? prev : { year, month })),
+    [],
+  );
 
   useEffect(() => {
     const msLeft = sessionEndsAt - Date.now();
@@ -55,8 +65,10 @@ export function Dashboard({
         </div>
       </header>
 
-      <main className="mx-auto max-w-6xl px-2 py-4 sm:px-6 sm:py-8">
-        <Calendar programId={programId} />
+      {/* "relative" lets the sticky notes sit beside the calendar on wide screens without moving it. */}
+      <main className="relative mx-auto max-w-6xl px-2 py-4 sm:px-6 sm:py-8">
+        <Calendar programId={programId} onViewChange={onViewChange} />
+        <StickyNotes programId={programId} year={shownMonth.year} month={shownMonth.month} />
       </main>
 
       {showChangePassword && <ChangePasswordDialog onClose={() => setShowChangePassword(false)} />}
