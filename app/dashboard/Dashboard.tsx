@@ -65,7 +65,6 @@ export function Dashboard({
         </div>
       </header>
 
-      {/* "relative" lets the sticky notes sit beside the calendar on wide screens without moving it. */}
       <main className="relative mx-auto max-w-6xl px-2 py-4 sm:px-6 sm:py-8">
         <Calendar programId={programId} onViewChange={onViewChange} />
         <StickyNotes programId={programId} year={shownMonth.year} month={shownMonth.month} />

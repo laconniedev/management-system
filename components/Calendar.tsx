@@ -7,15 +7,14 @@ import { BADGE_STYLES, badgeKey, sortItems, type Item } from "@/lib/items";
 import { CloudBanner } from "./CloudBanner";
 import { DayDialog } from "./DayDialog";
 
-const MAX_CHIPS = 3; // desktop: show up to 3, or 2 + "+N more"
-const MAX_DOTS = 3; // phone: show up to 3 dots, then "+N"
+const MAX_CHIPS = 3; 
+const MAX_DOTS = 3; 
 
 export function Calendar({
   programId,
   onViewChange,
 }: {
   programId: string;
-  /** Called with the month being shown (month is 0-based), e.g. so the sticky notes can follow it. */
   onViewChange?: (year: number, month: number) => void;
 }) {
   const supabase = useMemo(() => getBrowserClient(), []);
@@ -44,7 +43,7 @@ export function Calendar({
       .gte("item_date", rangeStart)
       .lte("item_date", rangeEnd)
       .order("created_at", { ascending: true });
-    if (id !== requestId.current) return; // a newer request replaced this one
+    if (id !== requestId.current) return; 
     if (error) {
       setLoadError("Couldn't load the calendar. Check your connection and try again.");
       return;
@@ -60,7 +59,7 @@ export function Calendar({
     load();
   }, [load]);
 
-  // Live updates: when anyone on this program submits, edits, or deletes, reload.
+  // live updates: when anyone on this program submits, edits, or deletes, reload.
   useEffect(() => {
     const channel = supabase
       .channel(`items-${programId}`)
@@ -136,7 +135,6 @@ export function Calendar({
           </p>
         )}
 
-        {/* Day names bar */}
         <div className="mr-1.5 grid grid-cols-7 border-2 border-cloud bg-white shadow-[6px_6px_0_#A9D8E3] sm:mr-2">
           {WEEKDAYS.map((day, i) => (
             <div
@@ -150,7 +148,6 @@ export function Calendar({
           ))}
         </div>
 
-        {/* Day grid */}
         <div className="mr-1.5 mt-4 grid grid-cols-7 border-l-2 border-t-2 border-cloud bg-white shadow-[6px_6px_0_#A9D8E3] sm:mr-2 sm:mt-5 sm:shadow-[8px_8px_0_#A9D8E3]">
           {days.map((date) => {
             const key = toKey(date);
@@ -223,7 +220,7 @@ function DayCell({
         >
           {date.getDate()}
         </span>
-        {/* Plus icon: appears on hover on desktop */}
+        {/* plus icon: appears on hover on desktop */}
         <span
           aria-hidden="true"
           className="hidden h-6 w-6 items-center justify-center rounded-full bg-accent2 text-base font-bold leading-none text-teal opacity-0 transition group-hover:opacity-100 group-focus-visible:opacity-100 sm:flex"
@@ -232,7 +229,6 @@ function DayCell({
         </span>
       </span>
 
-      {/* Desktop and tablet: titled chips */}
       <span className="hidden flex-col gap-1 sm:flex">
         {chips.map((item) => (
           <span
@@ -245,7 +241,6 @@ function DayCell({
         {hiddenChips > 0 && <span className="px-1 text-xs font-semibold text-teal">+{hiddenChips} more</span>}
       </span>
 
-      {/* Phone: colored dots */}
       <span className="flex flex-wrap items-center gap-1 px-0.5 sm:hidden">
         {dots.map((item) => (
           <span key={item.id} className={`h-2 w-2 rounded-full ${BADGE_STYLES[badgeKey(item)].dot}`} />

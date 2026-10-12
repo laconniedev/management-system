@@ -1,6 +1,3 @@
--- Sticky notes: remember which words are highlighted on each note.
--- Run once in Supabase → SQL Editor. Safe: only adds a column and a trigger; no data is changed.
-
 alter table public.sticky_notes
   add column if not exists highlights jsonb not null default '[]'::jsonb;
 

@@ -7,7 +7,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { PASSWORD_MIN, verifyDirectorCode } from "@/lib/program";
 import { SESSION_COOKIE } from "@/lib/session";
 
-/** Logs out this browser only. Other staff on the same program stay logged in. */
+/** logs out this browser only. Other staff on the same program stay logged in. */
 export async function logout() {
   const supabase = await createClient();
   await supabase.auth.signOut({ scope: "local" });
@@ -18,7 +18,7 @@ export async function logout() {
 
 export type ChangePasswordState = { error?: string; success?: boolean } | undefined;
 
-/** Changing the program password requires the director code, so regular staff can't do it. */
+/** changing the program password requires the director code, so regular staff can't do it. */
 export async function changePassword(
   _prev: ChangePasswordState,
   formData: FormData,
@@ -44,7 +44,7 @@ export async function changePassword(
     return { error: "The app isn't fully set up yet." };
   }
 
-  // Director codes live in a table only the server can read.
+  // director codes live in a table only the server can read.
   const { data: secret, error: secretError } = await admin
     .from("program_secrets")
     .select("director_code_hash")
@@ -59,7 +59,7 @@ export async function changePassword(
     return { error: "That director code is incorrect." };
   }
 
-  // Admin update keeps everyone who is already logged in signed in.
+  // admin update keeps everyone who is already logged in signed in.
   const { error } = await admin.auth.admin.updateUserById(user.id, { password: next });
   if (error) {
     if (error.code === "weak_password") return { error: error.message };

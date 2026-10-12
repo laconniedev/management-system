@@ -1,6 +1,3 @@
-// Scalloped cloud strip from the calendar template. It repeats sideways,
-// so it looks the same at any screen width without stretching.
-
 const TILE = 300;
 const CLOUDS: [number, number, number][] = [
   [10, 112, 46],

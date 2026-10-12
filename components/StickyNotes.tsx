@@ -13,22 +13,16 @@ import {
   type NoteData,
 } from "@/lib/stickyNotes";
 
-const SAVE_DELAY_MS = 500; // save this long after the last keystroke
-const DOUBLE_CLICK_WAIT_MS = 250; // a click on a highlight waits this long in case it's a double-click
+const SAVE_DELAY_MS = 500;
+const DOUBLE_CLICK_WAIT_MS = 250;
 
-// Phones only view the notes. Narrow screens and landscape phones count as phones.
 const VIEW_ONLY_QUERY = "(max-width: 639px), (pointer: coarse) and (max-height: 500px)";
 
-// Wide screens (1640px+): notes sit in the empty space beside the calendar, without moving it.
-// Narrower screens: the same six notes sit in a grid under the calendar: 3 across (left-side notes on
-// the first row, right-side on the second), or on phones 2 columns mirroring the left and right sides.
 const WRAPPER =
   "mt-10 grid grid-flow-col grid-cols-2 grid-rows-3 gap-x-5 gap-y-8 px-1 sm:grid-flow-row sm:grid-cols-3 sm:grid-rows-none sm:gap-x-8 min-[1640px]:contents";
 const GROUP =
   "contents min-[1640px]:absolute min-[1640px]:top-8 min-[1640px]:flex min-[1640px]:w-[210px] min-[1640px]:flex-col min-[1640px]:gap-10";
 
-// Shared by the display text, the editing box, and the highlight layer behind it,
-// so the text sits in exactly the same place in all three.
 const TEXT_BOX =
   "h-full w-full overflow-y-auto whitespace-pre-wrap break-words px-4 pb-3 pt-6 font-sans text-[15px] leading-6 [scrollbar-gutter:stable]";
 
@@ -43,8 +37,6 @@ export function StickyNotes({ programId, year, month }: { programId: string; yea
   const [error, setError] = useState<string | null>(null);
   const viewOnly = useMediaQuery(VIEW_ONLY_QUERY);
 
-  // Notes with unsaved or in-flight changes, or being typed in, keep their local text
-  // when a live update arrives, so a reload never wipes out what someone is typing.
   const editing = useRef(new Set<string>());
   const pending = useRef(new Map<string, Pending>());
   const inFlight = useRef(new Map<string, number>());
@@ -61,7 +53,7 @@ export function StickyNotes({ programId, year, month }: { programId: string; yea
       .select("slot, content, highlights")
       .eq("program_id", programId)
       .eq("month", m);
-    if (id !== requestId.current) return; // a newer request replaced this one
+    if (id !== requestId.current) return;
     if (error) {
       setError("Couldn't load the sticky notes. Check your connection and try again.");
       return;
@@ -88,7 +80,6 @@ export function StickyNotes({ programId, year, month }: { programId: string; yea
     load();
   }, [load]);
 
-  // Live updates: when anyone on this program changes a note, reload.
   useEffect(() => {
     const channel = supabase
       .channel(`sticky-notes-${programId}`)
@@ -132,7 +123,6 @@ export function StickyNotes({ programId, year, month }: { programId: string; yea
     [supabase, programId],
   );
 
-  // Save any unsaved notes when leaving the page.
   const flushRef = useRef(flush);
   flushRef.current = flush;
   useEffect(() => {
@@ -173,7 +163,7 @@ export function StickyNotes({ programId, year, month }: { programId: string; yea
         onEditEnd={async () => {
           editing.current.delete(key);
           await flush(key);
-          loadRef.current(); // pick up anything others changed while this note was open
+          loadRef.current();
         }}
         onChange={(data, saveNow) => update(cfg.slot, data, saveNow)}
       />
@@ -234,7 +224,6 @@ function StickyNote({
 
   useEffect(() => () => window.clearTimeout(clickTimer.current), []);
 
-  // If the note becomes view-only (window shrunk to phone size) while open, close it.
   useEffect(() => {
     if (isEditing && !canEdit) areaRef.current?.blur();
   }, [isEditing, canEdit]);
@@ -253,7 +242,6 @@ function StickyNote({
     onEditStart();
   };
 
-  // Dragging across words (outside of editing) highlights them when the mouse is let go.
   const highlightSelection = () => {
     const container = textRef.current;
     const sel = window.getSelection();
@@ -271,7 +259,7 @@ function StickyNote({
     const end = container.contains(range.endContainer) ? offsetOf(range.endContainer, range.endOffset) : text.length;
     sel.removeAllRanges();
     if (end <= start) return;
-    skipClick.current = true; // the click that follows this mouse-up shouldn't open the note
+    skipClick.current = true;
     onChange(
       { content: text, highlights: normalizeRanges([...dataRef.current.highlights, [start, end]], text.length) },
       true,
@@ -281,11 +269,10 @@ function StickyNote({
   const onMouseDown = (e: React.MouseEvent) => {
     if (!canEdit || isEditing || e.button !== 0) return;
     if (e.detail > 1) {
-      e.preventDefault(); // stop double-click from selecting a word
+      e.preventDefault();
       return;
     }
     skipClick.current = false;
-    // Listen on the whole page so a drag that ends just outside the note still counts.
     document.addEventListener("mouseup", (up) => up.detail <= 1 && highlightSelection(), { once: true });
   };
 
@@ -297,7 +284,6 @@ function StickyNote({
     }
     if (e.detail > 1) return;
     if ((e.target as HTMLElement).closest("mark")) {
-      // Might be the first half of a double-click that removes this highlight.
       window.clearTimeout(clickTimer.current);
       clickTimer.current = window.setTimeout(startEditing, DOUBLE_CLICK_WAIT_MS);
     } else {
@@ -366,7 +352,6 @@ function StickyNote({
 
         {isEditing ? (
           <>
-            {/* Highlight layer behind the transparent typing box, so highlights stay visible while editing. */}
             <div ref={backdropRef} aria-hidden="true" className={`absolute inset-0 overflow-hidden text-transparent ${TEXT_BOX}`}>
               {marks("text-transparent")}
               {"\n"}
@@ -409,7 +394,6 @@ function StickyNote({
   );
 }
 
-/** Washi tape across the top of a note, with zigzag torn ends. */
 function Tape({ color }: { color: string }) {
   return (
     <svg

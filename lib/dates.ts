@@ -1,6 +1,3 @@
-// Dates are handled as plain YYYY-MM-DD strings in the user's local time,
-// so a lesson on Oct 5 is always Oct 5 regardless of time zone.
-
 const pad = (n: number) => String(n).padStart(2, "0");
 
 export function toKey(d: Date): string {

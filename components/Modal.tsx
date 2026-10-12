@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import { SheepIcon } from "./Sheep";
 
-/** Pop-up window that dims the page behind it. Closes on Escape, the X button, or a click outside. */
+/** pop-up window that dims the page behind it. */
 export function Modal({
   title,
   onClose,

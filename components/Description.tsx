@@ -1,4 +1,4 @@
-/** Shows a description, turning lines that start with "-" into bullet points. */
+
 export function Description({ text }: { text: string }) {
   const blocks: ({ type: "p"; text: string } | { type: "ul"; items: string[] })[] = [];
 

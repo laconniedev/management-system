@@ -1,6 +1,3 @@
-// Original sheep drawn for this project: fluffy scalloped head, navy outline,
-// pale peach face, pink cheeks, small ears.
-
 const PUFFS: [number, number][] = [
   [34, 0], [27.5, 20], [10.5, 32.3], [-10.5, 32.3], [-27.5, 20],
   [-34, 0], [-27.5, -20], [-10.5, -32.3], [10.5, -32.3], [27.5, -20],
